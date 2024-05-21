@@ -1,0 +1,49 @@
+# Tipe data untuk Customer
+type Customer {
+  qrCode: String!
+  nama: String!
+  wallet: String!
+}
+
+# Tipe data untuk Barang
+type Barang {
+  rfid: String!
+  namaBarang: String!
+  hargaSatuan: Int!
+}
+
+# Tipe data untuk Transaksi
+type Transaksi {
+  _id: String!
+  qrCode: String!
+  rfid: String!
+  hargaSatuan: Int!
+  jumlah: Int!
+  date: String!
+}
+
+# Tipe data untuk TransaksiInputNew
+type TransaksiInput {
+  
+  qrCode: String!
+  rfid: String!
+  hargaSatuan: Int!
+  jumlah: Int!
+
+}
+
+# Kueri dan Mutasi
+type Query {
+  checkInBarang(rfid: String!): Barang
+  getAllTransactions: [Transaksi]!
+}
+
+type Mutation {
+  SaveTransaction(data: TransaksiInput!): Transaksi
+}
+
+# Skema GraphQL
+schema {
+  query: Query
+  mutation: Mutation
+}
