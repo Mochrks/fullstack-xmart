@@ -6,43 +6,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.project.usecase.xmart.common.Urls;
 import com.example.project.usecase.xmart.dto.request.AddBarangDTO;
 import com.example.project.usecase.xmart.dto.request.EditBarangDTO;
 import com.example.project.usecase.xmart.services.BarangService;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class BarangController {
 
     @Autowired
     private BarangService barangService;
 
-    @GetMapping("products")
+    @GetMapping(Urls.FIND_ALL_PRODUCTS)
     public ResponseEntity<Object> findAllProduct() {
         return barangService.getAllBarang();
     }
 
-    @GetMapping("products/{id}")
+    @GetMapping(Urls.FIND_BY_ID_PRODUCT)
     public ResponseEntity<Object> findByIdProduct(@PathVariable("id") UUID id) {
         return barangService.getBarangById(id);
     }
 
-    @PostMapping("products/add")
+    @PostMapping(Urls.CREATE_PRODUCT)
     public ResponseEntity<Object> createProduct(@RequestBody AddBarangDTO addBarang) {
         return barangService.addToBarang(addBarang);
     }
 
-    @PutMapping("products/edit/{rfid}")
+    @PutMapping(Urls.EDIT_PRODUCT)
     public ResponseEntity<Object> editProduct(@PathVariable UUID rfid,
             @RequestBody EditBarangDTO editProducts) {
         return barangService.editBarang(rfid, editProducts);
     }
 
-    @DeleteMapping("products/delete/{rfid}")
+    @DeleteMapping(Urls.DELETE_PRODUCT)
     public ResponseEntity<Object> deleteByIdProduct(@PathVariable UUID rfid) {
         return barangService.deleteBarangByRfid(rfid);
     }
-
-    
 
 }

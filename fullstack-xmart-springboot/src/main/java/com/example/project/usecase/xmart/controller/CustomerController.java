@@ -9,36 +9,37 @@ import org.springframework.web.bind.annotation.*;
 import com.example.project.usecase.xmart.dto.request.AddCustomerDTO;
 import com.example.project.usecase.xmart.dto.request.EditCustomerDTO;
 import com.example.project.usecase.xmart.services.CustomerService;
+import com.example.project.usecase.xmart.common.Urls;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("customers")
+    @GetMapping(Urls.FIND_ALL_CUSTOMERS)
     public ResponseEntity<Object> findAllCustomer() {
         return customerService.getAllCustomer();
     }
 
-    @GetMapping("customers/{id}")
+    @GetMapping(Urls.FIND_BY_ID_CUSTOMER)
     public ResponseEntity<Object> findByIdCustomer(@PathVariable("id") UUID id) {
         return customerService.getCustomerById(id);
     }
 
-    @PostMapping("customers/add")
+    @PostMapping(Urls.CREATE_CUSTOMER)
     public ResponseEntity<Object> createCustomer(@RequestBody AddCustomerDTO addCustomer) {
         return customerService.addToCustomer(addCustomer);
     }
 
-    @PutMapping("customers/edit/{qrcode}")
+    @PutMapping(Urls.EDIT_CUSTOMER)
     public ResponseEntity<Object> editCustomer(@PathVariable UUID qrcode,
             @RequestBody EditCustomerDTO editCustomer) {
         return customerService.editCustomer(qrcode, editCustomer);
     }
 
-    @DeleteMapping("customers/delete/{qrcode}")
+    @DeleteMapping(Urls.DELETE_CUSTOMER)
     public ResponseEntity<Object> deleteByIdCustomer(@PathVariable UUID qrcode) {
 
         return customerService.deleteCustomerById(qrcode);
