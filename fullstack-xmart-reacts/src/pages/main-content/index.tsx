@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,14 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { Html5QrcodeScanner } from "html5-qrcode";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import QRCode from "react-qr-code";
 
 function MainContent() {
@@ -25,8 +24,6 @@ function MainContent() {
   const [progress, setProgress] = React.useState(2);
   const navigate = useNavigate();
   const [getClient, setClient] = useState(null);
-  const [scanResult, setScanResult] = useState();
-  const [customer, setCustomer] = useState();
 
   const toggleScanner = () => {
     setShowLoading(true);
@@ -55,9 +52,7 @@ function MainContent() {
 
   useEffect(() => {
     axios
-      .get(
-        "http://localhost:8080/api/customers/a2c90816-de95-44f5-8dec-ebe3e300d8a7"
-      )
+      .get("http://localhost:8080/api/customers/{$qrcode}")
       .then((response) => {
         setClient(response.data.data);
         console.log(response.data.data);
@@ -67,98 +62,76 @@ function MainContent() {
       });
   }, []);
 
-  // const startScanner = () => {
-  //   const scanner = new Html5QrcodeScanner(
-  //     "reader",
-  //     {
-  //       qrbox: {
-  //         width: 500,
-  //         height: 500,
-  //       },
-  //       fps: 1,
-  //       disableFlip: false,
-  //       formatsToSupport: [
-  //         Html5QrcodeSupportedFormats.QR_CODE,
-  //         Html5QrcodeSupportedFormats.CODE_128,
-  //       ],
-  //     },
-  //     false
-  //   );
-  //   scanner.render(
-  //     async (result) => {
-  //       const customerExist = await checkCustomer(result);
-  //       if (customerExist) {
-  //         setCustomer({
-  //           nama: customerExist.nama,
-  //           wallet: customerExist.wallet,
-  //           qrCode: customerExist.qrCode,
-  //         });
-  //       } else {
-  //         setCustomer();
-  //       }
-  //       setScanResult(result);
-  //       scanner.clear();
-  //     },
-  //     (error) => {
-  //       console.warn(error);
-  //     }
-  //   );
-  // };
+  const [result, setResult] = useState("No result");
+  const qrCodeScannerRef = useRef(null);
 
-  // const checkCustomer = async (qrResult) => {
-  //   const customerExist = await getCustomerById(qrResult);
-  //   if (customerExist) {
-  //     return customerExist.data;
-  //   } else {
-  //     return null;
-  //   }
-  // };
+  useEffect(() => {
+    if (qrCodeScannerRef.current) {
+      const scanner = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 20, qrbox: 200 },
+        false
+      );
+
+      scanner.render(onScanSuccess, onScanError);
+
+      return () => {
+        scanner.clear().catch((error) => {
+          console.error("Failed to clear scanner. ", error);
+        });
+      };
+    }
+  }, []);
+
+  const onScanSuccess = (decodedText, decodedResult) => {
+    if (decodedText === "{$qrcode}") {
+      toggleScanner();
+    } else {
+      setResult(decodedText);
+    }
+  };
+
+  const onScanError = (errorMessage) => {
+    console.error(errorMessage);
+  };
 
   return (
     <>
-      <>
+      <div className="container ">
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             {showScanner ? (
-              <>
+              <div className="container">
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl py-10">
                   Scan here to continue shopping
                 </h1>
-                <Card
-                  className="w-[450px]"
-                  style={{ backgroundColor: "#fbfbfb" }}
-                >
-                  {showLoading ? (
-                    <div className="flex  text-center items-center justify-center">
-                      <img
-                        src="../src/assets/img/barcode.gif"
-                        alt="Qrcode"
-                        className="object-cover w-[280px] h-[280px] rounded-md "
-                      />
+                <Card className="w-full" style={{ backgroundColor: "#fbfbfb" }}>
+                  <CardHeader>
+                    <CardTitle>Start Now!</CardTitle>
+                    <CardDescription>
+                      Please scan before shopping!!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-center ">
+                      <QrCodeIcon className="w-14 h-14 text-black" />
                     </div>
-                  ) : (
-                    <>
-                      <CardHeader>
-                        <CardTitle>Start Now!</CardTitle>
-                        <CardDescription>
-                          Please scan before shopping!!
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center justify-center ">
-                          <QrCodeIcon className="w-14 h-14 text-black" />
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-center">
-                        <Button onClick={toggleScanner}>Start Scanner</Button>
-                      </CardFooter>
-                    </>
-                  )}
+                    <div className="flex items-center justify-center ">
+                      <div
+                        id="qr-reader"
+                        ref={qrCodeScannerRef}
+                        style={{ width: "300px" }}
+                      ></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-center">
+                    <Button>{result}</Button>
+                  </CardFooter>
                 </Card>
-              </>
+              </div>
             ) : (
-              <>
-                <Card className="w-[450px]">
+              <div className="container">
+                <Card className="w-full">
                   <CardHeader>
                     <CardTitle>Information</CardTitle>
                     <CardDescription>
@@ -192,7 +165,7 @@ function MainContent() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </>
+              </div>
             )}
             {showLoading && (
               <div>
@@ -213,7 +186,7 @@ function MainContent() {
             )}
           </div>
         </div>
-      </>
+      </div>
     </>
   );
 }

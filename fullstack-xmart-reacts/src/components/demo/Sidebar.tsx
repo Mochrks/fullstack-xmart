@@ -12,9 +12,9 @@ import {
 
 export function Sidebar() {
   return (
-    <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 bg-slate-700">
       <div className="mb-2 p-4">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-3xl">
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-3xl text-white">
           Xmart
         </h1>
       </div>
@@ -25,9 +25,9 @@ export function Sidebar() {
           <li className="p-2">
             <NavLink
               to="/shop"
-              className="block text-gray-600 hover:text-gray-800"
+              className="block text-gray-600 hover:text-white-800 text-white"
             >
-              <ShoppingBagIcon className="h-5 w-5 inline-block mr-2" />
+              <ShoppingBagIcon className="h-5 w-5 inline-block mr-2 text-white" />
               Item List
             </NavLink>
             <hr className="my-1" />
@@ -35,7 +35,7 @@ export function Sidebar() {
           <li className="p-2">
             <NavLink
               to="/shop/detail-transaction"
-              className="block text-gray-600 hover:text-gray-800"
+              className="block text-gray-600 hover:text-white-800 text-white"
             >
               <ArchiveBoxIcon className="h-5 w-5 inline-block mr-2" />
               Detail Transaction
@@ -45,7 +45,7 @@ export function Sidebar() {
           <li className="p-2">
             <NavLink
               to="/history"
-              className="block text-gray-600 hover:text-gray-800"
+              className="block text-gray-600 hover:text-white-800 text-white"
             >
               <BookOpenIcon className="h-5 w-5 inline-block mr-2" />
               History
@@ -55,12 +55,12 @@ export function Sidebar() {
           <li className="p-2">
             <NavLink
               to="/data"
-              className="block text-gray-600 hover:text-gray-800"
+              className="block text-gray-600 hover:text-white-800 text-white"
             >
               <CircleStackIcon className="h-5 w-5 inline-block mr-2" />
               Data
             </NavLink>
-            <hr className="my-1" />
+            <hr className="my-1 " />
           </li>
         </ul>
       </nav>
