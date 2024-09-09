@@ -105,7 +105,7 @@ function MainContent() {
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl py-10">
                   Scan here to continue shopping
                 </h1>
-                <Card className="w-full" style={{ backgroundColor: "#fbfbfb" }}>
+                <Card className="w-full shadow-lg" style={{ backgroundColor: "#fbfbfb" }}>
                   <CardHeader>
                     <CardTitle>Start Now!</CardTitle>
                     <CardDescription>

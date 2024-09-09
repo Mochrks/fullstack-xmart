@@ -65,7 +65,7 @@ export default function DetailTransaction() {
                 </h1>
               </div>
 
-              <div className="flex flex-row flex-wrap flex w-[70rem] max-w-[70rem] flex-col gap-5 ">
+              <div className="flex flex-row flex-wrap w-[70rem] max-w-[70rem] gap-5 ">
                 <div>
                   <div className="flex items-center justify-center mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 bg-gray-200 mt-6">
                     <div className="flex-grow ml-4 ">
