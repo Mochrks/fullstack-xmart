@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import QRCode from "react-qr-code";
+import { motion, AnimatePresence } from "framer-motion";
 
 function MainContent() {
   const [showScanner, setShowScanner] = useState(true);
@@ -96,12 +97,24 @@ function MainContent() {
   };
 
   return (
-    <>
-      <div className="container ">
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="container"
+    >
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <AnimatePresence mode="wait">
             {showScanner ? (
-              <div className="container">
+              <motion.div
+                key="scanner"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+                className="container"
+              >
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl py-10">
                   Scan here to continue shopping
                 </h1>
@@ -113,9 +126,13 @@ function MainContent() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-center ">
+                    <motion.div
+                      className="flex items-center justify-center"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                    >
                       <QrCodeIcon className="w-14 h-14 text-black" />
-                    </div>
+                    </motion.div>
                     <div className="flex items-center justify-center ">
                       <div
                         id="qr-reader"
@@ -128,14 +145,21 @@ function MainContent() {
                     <Button>{result}</Button>
                   </CardFooter>
                 </Card>
-              </div>
+              </motion.div>
             ) : (
-              <div className="container">
+              <motion.div
+                key="info"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+                className="container"
+              >
                 <Card className="w-full">
                   <CardHeader>
                     <CardTitle>Information</CardTitle>
                     <CardDescription>
-                      Detail information customer"
+                      Detail information customer
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -160,34 +184,46 @@ function MainContent() {
                     )}
                   </CardContent>
                   <CardFooter className="flex justify-center">
-                    <Button onClick={handleStartShopping}>
-                      Start Shopping
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button onClick={handleStartShopping}>
+                        Start Shopping
+                      </Button>
+                    </motion.div>
                   </CardFooter>
                 </Card>
-              </div>
+              </motion.div>
             )}
-            {showLoading && (
-              <div>
-                <Progress value={progress} className="w-[100%] h-[5px]" />
-              </div>
-            )}
+          </AnimatePresence>
+          {showLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Progress value={progress} className="w-[100%] h-[5px]" />
+            </motion.div>
+          )}
 
-            {showStart && (
-              <div className="mt-2">
-                <Alert className="bg-gray-200">
-                  <AlertTitle>Scan Process</AlertTitle>
-                  <AlertDescription>
-                    The QR code is currently being scanned to facilitate the
-                    shopping process.
-                  </AlertDescription>
-                </Alert>
-              </div>
-            )}
-          </div>
+          {showStart && (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 100 }}
+              className="mt-2"
+            >
+              <Alert className="bg-gray-200">
+                <AlertTitle>Scan Process</AlertTitle>
+                <AlertDescription>
+                  The QR code is currently being scanned to facilitate the
+                  shopping process.
+                </AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
         </div>
       </div>
-    </>
+    </motion.div>
   );
 }
 
