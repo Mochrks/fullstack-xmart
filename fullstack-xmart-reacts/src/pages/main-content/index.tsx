@@ -13,31 +13,92 @@ import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import QRCode from "react-qr-code";
 import { motion, AnimatePresence } from "framer-motion";
+import { getCustomers, getCustomerById } from "../../service/customerService";
+import { OctagonAlert } from 'lucide-react';
 
 function MainContent() {
   const [showScanner, setShowScanner] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
   const [showStart, setShowStart] = useState(false);
-  const [progress, setProgress] = React.useState(2);
-  const navigate = useNavigate();
+  const [progress, setProgress] = useState(60);
+  const [allCustomers, setAllCustomers] = useState([]);
   const [getClient, setClient] = useState(null);
+  const [result, setResult] = useState("No result");
+  const qrCodeScannerRef = useRef(null);
+  const scannerInstance = useRef(null);
+  const navigate = useNavigate();
+
+  // Fetch all customers 
+  const fetchAllCustomers = async () => {
+    try {
+      const response = await getCustomers();
+      setAllCustomers(response.data);
+      console.log("All customers fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching customer list:", error);
+    }
+  };
+
+  //fetch a customer by QR code
+  const fetchCustomerByQRCode = async (qrcode) => {
+    try {
+      const response = await getCustomerById(qrcode);
+      setClient(response.data);
+      console.log("Customer fetched by QR code:", response.data);
+    } catch (error) {
+      console.error("Error fetching customer by QR code:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCustomers();
+  }, []);
+
+  useEffect(() => {
+    if (result && result !== "No result") {
+      console.log("QR code scan result:", result);
+      fetchCustomerByQRCode(result);
+    }
+  }, [result]);
 
   const toggleScanner = () => {
     setShowLoading(true);
-
     setTimeout(() => {
       setShowScanner(!showScanner);
       setShowLoading(false);
     }, 2000);
   };
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 2000);
-    return () => clearTimeout(timer);
+  const onScanSuccess = (decodedText) => {
+    setResult(decodedText);
+    toggleScanner();
+  };
+
+  // const onScanError = (errorMessage) => {
+  //   console.error("QR scan error:", errorMessage);
+  // };
+
+  useEffect(() => {
+    if (qrCodeScannerRef.current && !scannerInstance.current) {
+      scannerInstance.current = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        false
+      );
+
+      scannerInstance.current.render(onScanSuccess);
+
+      return () => {
+        // Clear the scanner only when the component is unmounted
+        scannerInstance.current.clear().catch((error) => {
+          console.error("Failed to clear scanner. ", error);
+        });
+        scannerInstance.current = null;
+      };
+    }
   }, []);
 
   const handleStartShopping = () => {
@@ -51,50 +112,10 @@ function MainContent() {
     }, 2000);
   };
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/customers/{$qrcode}")
-      .then((response) => {
-        setClient(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching item lists:", error);
-      });
-  }, []);
-
-  const [result, setResult] = useState("No result");
-  const qrCodeScannerRef = useRef(null);
-
-  useEffect(() => {
-    if (qrCodeScannerRef.current) {
-      const scanner = new Html5QrcodeScanner(
-        "qr-reader",
-        { fps: 20, qrbox: 200 },
-        false
-      );
-
-      scanner.render(onScanSuccess, onScanError);
-
-      return () => {
-        scanner.clear().catch((error) => {
-          console.error("Failed to clear scanner. ", error);
-        });
-      };
-    }
-  }, []);
-
-  const onScanSuccess = (decodedText, decodedResult) => {
-    if (decodedText === "{$qrcode}") {
-      toggleScanner();
-    } else {
-      setResult(decodedText);
-    }
+  const handleTryScan = () => {
+    window.location.reload();
   };
 
-  const onScanError = (errorMessage) => {
-    console.error(errorMessage);
-  };
 
   return (
     <motion.div
@@ -163,7 +184,7 @@ function MainContent() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {getClient && (
+                    {getClient ? (
                       <div className="flex items-center">
                         <div className="flex-none">
                           <QRCode
@@ -181,13 +202,28 @@ function MainContent() {
                           <Badge>{getClient.wallet}</Badge>
                         </div>
                       </div>
+                    ) : (
+                      <div className="flex items-center">
+                        <div className="flex-none">
+                          <OctagonAlert className="w-14 h-14 text-red-500" />
+                        </div>
+                        <div className="flex-grow ml-4">
+                          <p className="text-red-500 text-lg font-bold">
+                            Data not found
+                          </p>
+                        </div>
+                      </div>
                     )}
                   </CardContent>
                   <CardFooter className="flex justify-center">
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button onClick={handleStartShopping}>
+                      {getClient ? (<Button onClick={handleStartShopping}>
                         Start Shopping
-                      </Button>
+                      </Button>) : (
+                        <Button onClick={handleTryScan}>
+                          Scan Again
+                        </Button>
+                      )}
                     </motion.div>
                   </CardFooter>
                 </Card>

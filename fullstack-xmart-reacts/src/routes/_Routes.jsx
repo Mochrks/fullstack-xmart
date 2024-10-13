@@ -1,10 +1,10 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Data from "@/components/demo/Data";
 import DetailTransaction from "@/components/demo/DetailTransaction";
 import History from "@/components/demo/History";
 import Content from "@/pages/content";
+import GenerateQRCode from "@/pages/generate-qrcode";
 import MainContent from "@/pages/main-content";
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 const _Routes = () => {
   return (
@@ -19,6 +19,7 @@ const _Routes = () => {
         />
         <Route exact path="/data" element={<Data />} />
         <Route exact path="/history" element={<History />} />
+        <Route exact path="/create-qr" element={<GenerateQRCode />} />
       </Routes>
     </Router>
   );
