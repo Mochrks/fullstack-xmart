@@ -1,13 +1,11 @@
 import React from "react";
-import ItemList from "@/components/demo/ItemList";
+import Dashboard from "@/components/demo/Dashboard";
 
 function Content() {
   return (
     <>
       <div className="min-h-full">
-        <div>
-          <ItemList />
-        </div>
+        <Dashboard />
       </div>
     </>
   );

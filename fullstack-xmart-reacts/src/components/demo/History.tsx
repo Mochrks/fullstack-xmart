@@ -1,13 +1,9 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
+
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -19,31 +15,25 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { Sidebar } from "./Sidebar";
+import { getTransactions } from "@/service/transactionService";
+import { formatRupiah } from "@/utils/formatIDR";
 
-const invoices = [
-  {
-    qrcode: "1jqad2i1-13910-12acn3d-123123",
-    rfid: "23fn3j-123kl9-231jklc3-23ojd1",
-    hargaSatuan: "Rp.15.000",
-    jumlah: "2",
-    waktu: "14-05-2024",
-  },
-  {
-    qrcode: "1jqad2i1-13910-12acn3d-123123",
-    rfid: "23fn3j-123kl9-231jklc3-23ojd1",
-    hargaSatuan: "Rp.15.000",
-    jumlah: "5",
-    waktu: "14-05-2024",
-  },
-  {
-    qrcode: "1jqad2i1-13910-12acn3d-123123",
-    rfid: "23fn3j-123kl9-231jklc3-23ojd1",
-    hargaSatuan: "Rp.15.000",
-    jumlah: "7",
-    waktu: "14-05-2024",
-  },
-];
 export default function History() {
+  const [transaction, setTransaction] = useState([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await getTransactions();
+        setTransaction(response.data);
+        console.log("Transactions data:", response.data);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
   return (
     <div className="bg-neutral-100">
       <div className="flex flex-row w-full h-full mx-auto gap-5 p-5 ">
@@ -71,7 +61,7 @@ export default function History() {
                 </h1>
               </div>
 
-              <div className="flex flex-row flex-wrap flex w-[70rem] max-w-[70rem] flex-col gap-5 ">
+              <div className="flex flex-col flex-wrap  w-[70rem] max-w-[70rem]  gap-5 ">
                 <div>
                   <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
                     <div className="bg-white">
@@ -80,25 +70,33 @@ export default function History() {
                           <TableRow>
                             <TableHead>Qrcode</TableHead>
                             <TableHead>Rfid</TableHead>
-                            <TableHead>Harga satuan</TableHead>
-                            <TableHead>Jumlah</TableHead>
-                            <TableHead className="text-right">Waktu</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>Qty</TableHead>
+                            <TableHead className="text-right">Date</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {invoices.map((invoice, index) => (
+                          {transaction.map((transaction, index) => (
                             <TableRow
-                              key={invoice.qrcode}
-                              className={index % 2 === 0 ? "bg-blue-100" : ""}
+                              key={transaction.id}
+                              className={
+                                index % 2 === 0 ? "bg-blue-100" : ""
+                              }
                             >
                               <TableCell className="font-medium">
-                                {invoice.qrcode}
+                                {transaction.qrcode}
                               </TableCell>
-                              <TableCell>{invoice.rfid}</TableCell>
-                              <TableCell>{invoice.hargaSatuan}</TableCell>
-                              <TableCell>{invoice.jumlah}</TableCell>
+                              <TableCell>{transaction.rfid}</TableCell>
+                              <TableCell>
+                                {formatRupiah(transaction.hargaSatuan)}
+                              </TableCell>
+                              <TableCell>{transaction.jumlah}</TableCell>
                               <TableCell className="text-right">
-                                {invoice.waktu}
+                                {new Date().toLocaleDateString('id-ID', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                })}
                               </TableCell>
                             </TableRow>
                           ))}

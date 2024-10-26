@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -15,7 +12,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -29,58 +25,57 @@ import {
 
 import { Sidebar } from "./Sidebar";
 
+import { formatRupiah } from "@/utils/formatIDR";
+import { getCustomers } from "@/service/customerService";
+import { getProducts } from "@/service/productService";
+import { getTransactions } from "@/service/transactionService";
+
 export default function Data() {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [transaction, setTransaction] = useState([]);
 
-  function formatRupiah(angka) {
-    let number_string = angka.toString();
-    let sisa = number_string.length % 3;
-    let rupiah = number_string.substr(0, sisa);
-    let ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-    if (ribuan) {
-      let separator = sisa ? "." : "";
-      rupiah += separator + ribuan.join(".");
-    }
-
-    return "Rp " + rupiah;
-  }
-
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/customers")
-      .then((response) => {
-        setCustomers(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching customer lists:", error);
-      });
+    const fetchCustomers = async () => {
+      try {
+        const response = await getCustomers();
+        setCustomers(response.data);
+        console.log("Customers data:", response.data);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+      }
+    };
+
+    fetchCustomers();
   }, []);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/products")
-      .then((response) => {
-        setProducts(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching products lists:", error);
-      });
+    const fetchProducts = async () => {
+      try {
+        const response = await getProducts();
+        setProducts(response.data);
+        console.log("Products data:", response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
   }, []);
+
+
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/transactions")
-      .then((response) => {
-        setTransaction(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching products lists:", error);
-      });
+    const fetchTransactions = async () => {
+      try {
+        const response = await getTransactions();
+        setTransaction(response.data);
+        console.log("Transactions data:", response.data);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
   return (
@@ -169,9 +164,9 @@ export default function Data() {
                               <TableHeader>
                                 <TableRow>
                                   <TableHead>Rfid</TableHead>
-                                  <TableHead>Nama Barang</TableHead>
+                                  <TableHead>Name Product</TableHead>
                                   <TableHead className="text-right">
-                                    Harga satuan
+                                    Qty
                                   </TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -211,10 +206,10 @@ export default function Data() {
                                 <TableRow>
                                   <TableHead>Qrcode</TableHead>
                                   <TableHead>Rfid</TableHead>
-                                  <TableHead>Harga satuan</TableHead>
-                                  <TableHead>Jumlah</TableHead>
+                                  <TableHead>Price</TableHead>
+                                  <TableHead>Qty</TableHead>
                                   <TableHead className="text-right">
-                                    Waktu
+                                    Date
                                   </TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -235,7 +230,11 @@ export default function Data() {
                                     </TableCell>
                                     <TableCell>{transaction.jumlah}</TableCell>
                                     <TableCell className="text-right">
-                                      {transaction.waktu}
+                                      {new Date().toLocaleDateString('id-ID', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                      })}
                                     </TableCell>
                                   </TableRow>
                                 ))}

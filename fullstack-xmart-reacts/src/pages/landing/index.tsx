@@ -47,6 +47,7 @@ function MainContent() {
     try {
       const response = await getCustomerById(qrcode);
       setClient(response.data);
+      localStorage.setItem('customerData', JSON.stringify(response.data));
       console.log("Customer fetched by QR code:", response.data);
     } catch (error) {
       console.error("Error fetching customer by QR code:", error);
@@ -60,6 +61,8 @@ function MainContent() {
   useEffect(() => {
     if (result && result !== "No result") {
       console.log("QR code scan result:", result);
+
+      localStorage.setItem('qrcodeUser', result);
       fetchCustomerByQRCode(result);
     }
   }, [result]);
@@ -74,12 +77,10 @@ function MainContent() {
 
   const onScanSuccess = (decodedText) => {
     setResult(decodedText);
+
+    localStorage.setItem('qrcodeUser', decodedText);
     toggleScanner();
   };
-
-  // const onScanError = (errorMessage) => {
-  //   console.error("QR scan error:", errorMessage);
-  // };
 
   useEffect(() => {
     if (qrCodeScannerRef.current && !scannerInstance.current) {
